@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using System;
 using System.Globalization;
 using System.IO;
@@ -34,6 +33,7 @@ namespace BadNews
         {
             services.AddSingleton<INewsRepository, NewsRepository>();
             services.AddSingleton<INewsModelBuilder, NewsModelBuilder>();
+            services.AddControllersWithViews();
         }
 
         // В этом методе конфигурируется последовательность обработки HTTP-запроса
@@ -42,20 +42,25 @@ namespace BadNews
             app.UseDeveloperExceptionPage();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+            app.UseStatusCodePagesWithReExecute("/StatusCode/{0}");
 
             app.Map("/news", newsApp =>
             {
-                newsApp.Map("/fullarticle", fullArticleApp =>
-                {
-                    fullArticleApp.Run(RenderFullArticlePage);
-                });
+                newsApp.Map("/fullarticle", fullArticleApp => { fullArticleApp.Run(RenderFullArticlePage); });
 
                 newsApp.Run(RenderIndexPage);
             });
 
-            app.MapWhen(context => context.Request.Path == "/", rootPathApp =>
+            app.MapWhen(context => context.Request.Path == "/", rootPathApp => { rootPathApp.Run(RenderIndexPage); });
+
+            app.UseRouting();
+            app.UseEndpoints(endpoints =>
             {
-                rootPathApp.Run(RenderIndexPage);
+                endpoints.MapControllerRoute("status-code", "StatusCode/{code?}", new
+                {
+                    controller = "Errors",
+                    action = "StatusCode"
+                });
             });
 
             // Остальные запросы — 404 Not Found
