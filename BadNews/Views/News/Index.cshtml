@@ -1,5 +1,30 @@
 @using System.Web
 
+@model BadNews.Models.News.IndexModel
+
+@section Header
+{
+    <div class="row mb-2">
+        @foreach (var newsArticle in Model.FeaturedArticles)
+        {
+            var url = $"/news/fullarticle/{HttpUtility.UrlEncode(newsArticle.Id.ToString())}";
+
+            <div class="col-md-6">
+                <div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+                    <div class="col p-4 d-flex flex-column position-static">
+                        <h3 class="mb-0">@newsArticle.Header</h3>
+                        <div class="mb-1 text-muted">@newsArticle.Date.ToString("d MMM yyyy", ViewBag.Culture)</div>
+                        <p class="card-text mb-auto">
+                            @newsArticle.Teaser
+                        </p>
+                        <a href="@url">Читать полностью</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
 <main role="main" class="container">
     <div class="row">
         <div class="col-md-8 news-main">
