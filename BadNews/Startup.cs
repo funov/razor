@@ -14,6 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using Microsoft.Extensions.Hosting;
+using Serilog;
 
 namespace BadNews
 {
@@ -47,6 +48,7 @@ namespace BadNews
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+            app.UseSerilogRequestLogging();
             app.UseStatusCodePagesWithReExecute("/StatusCode/{0}");
 
             app.Map("/news", newsApp =>
